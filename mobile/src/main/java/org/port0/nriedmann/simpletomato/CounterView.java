@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -13,13 +14,12 @@ import android.view.View;
  */
 public class CounterView extends View {
 
-    private int count, max_count;
+    private int count;
+    private int max_count;
     private Paint paint, ghost;
     private RectF box;
 
-
-
-    public CounterView(Context c, AttributeSet attr, int count, int max_count) {
+    public CounterView(Context c, AttributeSet attr) {
         super(c, attr);
         this.paint = new Paint();
         this.paint.setAntiAlias(true);
@@ -30,18 +30,24 @@ public class CounterView extends View {
         this.ghost.setAlpha(50);
         this.ghost.setStyle(Paint.Style.FILL);
         this.ghost.setColor(Color.GRAY);
-        this.count = count;
-        this.max_count = max_count;
+        this.count = 0;
+        this.max_count = 4;
         box = new RectF(60, 60, 860, 260);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (int i = 1;i<max_count;i++){
+        for (int i = 1;i<=max_count;i++){
             Paint p = (i<=count)?paint:ghost;
-            canvas.drawCircle(box.width()*i/max_count, box.centerY(), (box.width()-40)/max_count, p);
+            float percent = (i<=count)?0.4f:0.3f;
+            canvas.drawCircle(box.width()*i/max_count, box.centerY(), box.width()/max_count*percent, p);
         }
+    }
+
+    public void update(int counter){
+        this.count=counter;
+        this.forceLayout();
     }
 
     public int getCount() {
@@ -50,5 +56,13 @@ public class CounterView extends View {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public int getMax_count() {
+        return max_count;
+    }
+
+    public void setMax_count(int max_count) {
+        this.max_count = max_count;
     }
 }

@@ -12,14 +12,12 @@
     tools:context="org.port0.nriedmann.simpletomato.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:text="Tomatoes:"
+    <org.port0.nriedmann.simpletomato.CounterView
         android:id="@+id/counter_view"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center" />
 
     <org.port0.nriedmann.simpletomato.CircleView
         android:id="@+id/timer_circle"
@@ -31,7 +29,7 @@
     <TextView
         android:text="BLAA"
         android:id="@+id/timer_text"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"

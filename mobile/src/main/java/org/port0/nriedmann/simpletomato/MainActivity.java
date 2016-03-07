@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
 
     private TextView timerText;
     private CircleView circle;
+    private CounterView counterView;
 
     private CountDownTimer currentTimer;
     private AlarmManager currentAlarm;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             time = breakTime;
             if (workCounter== longBreakInterval){
                 workCounter=0;
+                counterView.update(workCounter);
                 time = longBreak;
             }
         } else {
@@ -77,10 +79,10 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         //toggle break bool
         breakNow = !breakNow;
         //display counter
-        //String infostr = (breakNow)?"Time for a break!":"Get to work!";
-        ((TextView)findViewById(R.id.counter_view)).setText("Tomatoes: " + workCounter);//+"\n "+infostr);
+        if (workCounter!=counterView.getCount()){
+            counterView.update(workCounter);
+        }
         //reset circle
-        //CircleView circle = (CircleView) findViewById(R.id.timer_circle);
         CircleViewAnimation resetAnim = new CircleViewAnimation(circle,0);
         resetAnim.setDuration(700);
         circle.startAnimation(resetAnim);
@@ -191,9 +193,12 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         setNextTime();
         this.timerText = ((TextView)findViewById(R.id.timer_text));
         timerText.setText("" + time);
-        ((TextView)findViewById(R.id.counter_view)).setText("Tomatoes: " + workCounter);
         this.circle = (CircleView)findViewById(R.id.timer_circle);
         circle.setOnClickListener(viewClick);
+        this.counterView = (CounterView)findViewById(R.id.counter_view);
+        counterView.setCount(this.workCounter);
+        counterView.setMax_count(this.longBreakInterval);
+        counterView.forceLayout();
     }
 
     @Override

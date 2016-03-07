@@ -26,6 +26,7 @@ public class TimerNotificationSender extends BroadcastReceiver {
         notification.setColor(Color.RED);
         notification.setDefaults(Notification.DEFAULT_ALL);
         notification.setContentTitle(context.getString(R.string.app_name));
+        notification.setAutoCancel(true);
         boolean wasBreak = intent.getBooleanExtra("org.port0.nriemdann.SimpleTomato.isBreak", false);
         if (wasBreak == true) {
             notification.setContentText(context.getString(R.string.notification_break_done_text));
