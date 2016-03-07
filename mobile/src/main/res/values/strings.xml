@@ -23,4 +23,7 @@
     <string name="no">No</string>
     <string name="quit" >Quit</string>
     <string name="stay" >Stay</string>
+    <string name="action_about" >About</string>
+    <string name="about_text"><![CDATA[<p>(c)2016 Nicola M.H. Riedmann</p><p><a href=\"http://nriedmann.port0.org/apps\"> Check out my other apps!</a><p>]]></string>
+    <string name="ok">Ok</string>
 </resources>

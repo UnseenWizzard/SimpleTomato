@@ -15,4 +15,7 @@
     <string name="no">Nein</string>
     <string name="quit">Beenden</string>
     <string name="stay">Nicht beenden</string>
+    <string name="action_about" >Information</string>
+    <string name="about_text" ><![CDATA[<p>(c)2016 Nicola M.H. Riedmann</p><p><a href=\"http://nriedmann.port0.org/apps\"> Meine anderen Apps!</a><p>]]></string>
+    <string name="ok">Ok</string>
 </resources>

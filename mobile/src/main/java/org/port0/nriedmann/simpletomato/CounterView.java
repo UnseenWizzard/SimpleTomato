@@ -4,10 +4,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 
 /**
  * Created by nicol on 3/7/2016.
@@ -17,7 +19,6 @@ public class CounterView extends View {
     private int count;
     private int max_count;
     private Paint paint, ghost;
-    private RectF box;
 
     public CounterView(Context c, AttributeSet attr) {
         super(c, attr);
@@ -32,16 +33,19 @@ public class CounterView extends View {
         this.ghost.setColor(Color.GRAY);
         this.count = 0;
         this.max_count = 4;
-        box = new RectF(60, 60, 860, 260);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (int i = 1;i<=max_count;i++){
-            Paint p = (i<=count)?paint:ghost;
-            float percent = (i<=count)?0.4f:0.3f;
-            canvas.drawCircle(box.width()*i/max_count, box.centerY(), box.width()/max_count*percent, p);
+        float width = canvas.getWidth();
+        //canvas.drawRect(box,paint);
+        float pos = width/max_count/2;
+        for (float i = 0;i<max_count;i++){
+            Paint p = (i<count)?paint:ghost;
+            float percent = (i<count)?0.4f:0.3f;
+            Log.i("Circle "+i, (pos+width*i/max_count)+"");
+            canvas.drawCircle(pos+width*i/max_count, (width/max_count)*0.5f, (width/max_count)*percent, p);
         }
     }
 

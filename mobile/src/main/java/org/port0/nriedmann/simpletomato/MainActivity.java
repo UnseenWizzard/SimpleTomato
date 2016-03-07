@@ -13,6 +13,10 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -226,6 +230,17 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             DialogFragment settingsDialog = new SettingsDialog();
             settingsDialog.setArguments(b);
             settingsDialog.show(getFragmentManager(), "settings");
+        } else if (id == R.id.action_about){
+//            SpannableString message = new SpannableString(getString(R.string.about_text));
+//            Linkify.addLinks(message,Linkify.ALL);
+            TextView messageView = new TextView(this);
+            messageView.setText(Html.fromHtml(getString(R.string.about_text)));
+            messageView.setMovementMethod(LinkMovementMethod.getInstance());
+            messageView.setClickable(true);
+            new AlertDialog.Builder(this)
+                    .setView(messageView)
+                    .setCancelable(true)
+                    .show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -250,6 +265,8 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             }
             ((TextView)findViewById(R.id.timer_text)).setText("" + time);
         }
+        counterView.setMax_count(this.longBreakInterval);
+        counterView.forceLayout();
     }
 
     private void savePreferences(boolean justRunningInfo){
