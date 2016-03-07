@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SimpleTomato</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="time_work">Dauer Arbeit</string>
+    <string name="time_break">Dauer Pause</string>
+    <string name="time_break_long">Dauer Lange Pause</string>
+    <string name="counter_work">Arbeitseinheiten bis zur langen Pause</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="notification_break_done_text" >Die Pause ist vorbei, zurück an die Arbeit!</string>
+    <string name="notification_work_done_text" >Super gearbeitet, mach eine Pause!</string>
+    <string name="confirm_exit">Wirklich Beenden?\nDas bricht den laufenden Alarm ab.\nSoll die Uhr weiterlaufen, bitte mit dem Home-Button beenden!</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="quit">Beenden</string>
+    <string name="stay">Nicht beenden</string>
+</resources>

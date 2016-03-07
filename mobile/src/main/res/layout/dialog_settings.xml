@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_gravity="right"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_centerInParent="true"
+                android:id="@+id/work"
+                android:layout_centerVertical="true"
+                android:text="@string/time_work"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <NumberPicker
+                android:layout_marginLeft="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@id/work"
+                android:id="@+id/dialog_settings_time_picker_work"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+        <View style="@style/Seperator" android:layout_below="@id/dialog_settings_time_picker_work"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/brk"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:text="@string/time_break"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <NumberPicker
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/dialog_settings_time_picker_break"
+            android:layout_toRightOf="@id/brk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </NumberPicker>
+        </RelativeLayout>
+        <View style="@style/Seperator" android:layout_below="@id/dialog_settings_time_picker_work"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/lbrk"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+        android:text="@string/time_break_long"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <NumberPicker
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/dialog_settings_time_picker_long_break"
+            android:layout_toRightOf="@id/lbrk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </NumberPicker>
+        </RelativeLayout>
+        <View style="@style/Seperator" android:layout_below="@id/dialog_settings_time_picker_work"/>
+        <RelativeLayout
+            android:layout_gravity="right"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/ctr"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:text="@string/counter_work"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <NumberPicker
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/dialog_settings_counter_picker"
+            android:layout_toRightOf="@id/ctr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </NumberPicker>
+        </RelativeLayout>
+
+    </LinearLayout>
+    </ScrollView>

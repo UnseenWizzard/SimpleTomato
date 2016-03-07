@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">SimpleTomato</string>
+    <string name="action_settings">Settings</string>
+    <string name="time_work">Work Duration</string>
+    <string name="time_break">Break Duration</string>
+    <string name="time_break_long">Long Break Duration</string>
+    <string name="counter_work">Work Intervals till long break</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="pref_file" translatable="false">org.port0.nriedman.simpletomato.preferences</string>
+    <string name="notification_break_done_text" >Your Break is over, get back to work!</string>
+    <string name="notification_work_done_text" >Well done, take a break!</string>
+    <string name="work_time" translatable="false">org.port0.nriedman.simpletomato.work_time_pref</string>
+    <string name="break_time" translatable="false">org.port0.nriedman.simpletomato.break_time_pref</string>
+    <string name="long_break_time" translatable="false">org.port0.nriedman.simpletomato.long_break_time_pref</string>
+    <string name="long_break_interval" translatable="false">org.port0.nriedman.simpletomato.long_break_interval</string>
+    <string name="work_counter" translatable="false">org.port0.nriedman.simpletomato.work_counter</string>
+    <string name="timer_running" translatable="false">org.port0.nriedman.simpletomato.timmer_running</string>
+    <string name="break_now" translatable="false">org.port0.nriedman.simpletomato.break_now</string>
+    <string name="saved_ms" translatable="false">org.port0.nriedmann.simpletomato.saved_ms</string>
+    <string name="confirm_exit">Do you really want to quit?\nThis will cancel any running timer.\nTo keep the timer running, please exit using the home button!</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="quit" >Quit</string>
+    <string name="stay" >Stay</string>
+</resources>
