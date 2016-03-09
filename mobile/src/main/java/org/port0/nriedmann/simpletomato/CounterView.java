@@ -38,20 +38,16 @@ public class CounterView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        //Log.i("Counter in View", count+"");
         float width = canvas.getWidth();
         //canvas.drawRect(box,paint);
         float pos = width/max_count/2;
         for (float i = 0;i<max_count;i++){
             Paint p = (i<count)?paint:ghost;
             float percent = (i<count)?0.4f:0.3f;
-            Log.i("Circle "+i, (pos+width*i/max_count)+"");
+            //Log.i("Circle "+i, (pos+width*i/max_count)+"");
             canvas.drawCircle(pos+width*i/max_count, (width/max_count)*0.5f, (width/max_count)*percent, p);
         }
-    }
-
-    public void update(int counter){
-        this.count=counter;
-        this.forceLayout();
     }
 
     public int getCount() {

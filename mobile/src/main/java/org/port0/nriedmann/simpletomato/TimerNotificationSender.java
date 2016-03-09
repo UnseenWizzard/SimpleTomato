@@ -34,6 +34,7 @@ public class TimerNotificationSender extends BroadcastReceiver {
             notification.setContentText(context.getString(R.string.notification_work_done_text));
         }
         Intent mainIntent = new Intent(context, MainActivity.class);
+        mainIntent.setType(Intent.ACTION_TIME_TICK);
         notification.setContentIntent(PendingIntent.getActivity(context,0,mainIntent,0));
         SharedPreferences pref = context.getSharedPreferences(context.getString(R.string.pref_file), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
