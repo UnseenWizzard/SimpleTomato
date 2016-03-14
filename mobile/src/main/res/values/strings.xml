@@ -15,7 +15,7 @@
     <string name="long_break_time" translatable="false">org.port0.nriedman.simpletomato.long_break_time_pref</string>
     <string name="long_break_interval" translatable="false">org.port0.nriedman.simpletomato.long_break_interval</string>
     <string name="work_counter" translatable="false">org.port0.nriedman.simpletomato.work_counter</string>
-    <string name="timer_running" translatable="false">org.port0.nriedman.simpletomato.timmer_running</string>
+    <string name="timer_running" translatable="false">org.port0.nriedman.simpletomato.timer_running</string>
     <string name="break_now" translatable="false">org.port0.nriedman.simpletomato.break_now</string>
     <string name="saved_ms" translatable="false">org.port0.nriedmann.simpletomato.saved_ms</string>
     <string name="confirm_exit">Do you really want to quit?\nThis will cancel any running timer.\nTo keep the timer running, please exit using the home button!</string>
@@ -26,4 +26,8 @@
     <string name="action_about" >About</string>
     <string name="about_text"><![CDATA[<p>(c)2016 Nicola M.H. Riedmann</p><p><a href=\"http://nriedmann.port0.org/apps\"> Check out my other apps!</a><p>]]></string>
     <string name="ok">Ok</string>
+    <string name="activity_running" translatable="false" >org.port0.nriedman.simpletomato.activity_running</string>
+    <string name="timer_info" translatable="false">org.port0.nriedman.simpletomato.TIMER_INFO_BROADCAST</string>
+    <string name="next_time_set" translatable="false">org.port0.nriedman.simpletomato.next_time_set</string>
+    <string name="start_from_notification" translatable="false">org.port0.nriedman.simpletomato.START_FROM_NOTFICATION</string>
 </resources>

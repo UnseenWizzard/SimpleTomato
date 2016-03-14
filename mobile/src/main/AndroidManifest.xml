@@ -18,8 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".TimerNotificationSender"/>
+        <receiver android:name=".TimerInfoReceiver"/>
+        <service android:name=".TimerService"/>
     </application>
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 </manifest>
