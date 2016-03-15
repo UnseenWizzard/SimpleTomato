@@ -25,24 +25,41 @@ import java.util.Calendar;
 /**
  * Created by nicol on 3/10/2016.
  */
-public class TimerService extends IntentService {
+public class TimerService extends Service {
 
     public final static String RUN_TIME_MS = "RUN_TIME_MS";
     public final static String IS_DONE = "IS_DONE";
+    private Thread worker;
 
-    public TimerService(){
-        super("TimerService");
+//    public TimerService(){
+//        super("TimerService");
+//    }
+
+    @Override
+    public void onDestroy() {
+        Log.i("Service","Service killed!!");
+        super.onDestroy();
+
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public void onCreate(){
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, final int startId) {
         //get timer time from intent
-        final long run_time_ms = intent.getLongExtra(RUN_TIME_MS,-1);
+        if (intent == null){
+            Log.e("Service","Started with null intent");
+            return -1;
+        }
+        final long run_time_ms = intent.getLongExtra(TimerService.RUN_TIME_MS,-1);
         //setup countdown timer, that updates the view via broadcast
         if (run_time_ms>0) {
 
             //set countdown timer
-            final CountDownTimer timer = new CountDownTimer(run_time_ms, 59950) {
+            final CountDownTimer timer = new CountDownTimer(run_time_ms, MainActivity.ONE_MINUTE) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     Log.i("Timerservice TICK: ", "ms " + millisUntilFinished);
@@ -126,22 +143,29 @@ public class TimerService extends IntentService {
                     mainIntent.setAction(getString(R.string.start_from_notification));
                     notification.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, mainIntent, 0));
                     ((NotificationManager) getSystemService(getApplicationContext().NOTIFICATION_SERVICE)).notify(42, notification.build());
-                    Looper.myLooper().quit();
+                    stopSelf(startId);
                 }
             };
-            //Thread worker = new Thread("TimerThread"){
-            //    @Override
-            //    public void run(){
+            worker = new Thread("TimerThread"){
+                @Override
+                public void run(){
                     timer.start();
-            //    }
-            //};
-           // worker.start();
-            //try {
-            //    worker.join();
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //}
-            Looper.loop();
+                }
+            };
+            worker.start();
+            try {
+                worker.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //Looper.loop();
         }
+        return START_FLAG_REDELIVERY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     private final String TIMER_RUNNING = "TIMER_RUNNING";
     private final String TIMER_START = "TIMER_START";
     private final String TIMER_END = "TIMER_END";
+    public static final long ONE_MINUTE = 59950;
 
     private long getMinutesInMillis(int minutes){
         return minutes*60*1000;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     }
 
     public void startTimer(long time_to_go){
+        long anim_time = time_to_go;
         if (!timer_running){
             //timer not running, start everything
             String msg = (break_now)?"Time for a break!":"Get to work!";
@@ -102,15 +104,17 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             timer_running =true;
             //start the timer service
             Intent timer_intent = new Intent(this,TimerService.class);
-            timer_intent.putExtra(TimerService.RUN_TIME_MS,getMinutesInMillis(time));
+            timer_intent.putExtra(TimerService.RUN_TIME_MS, getMinutesInMillis(time));
             startService(timer_intent);
-            //set animation
-            CircleViewAnimation anim = new CircleViewAnimation(circle,360);
-            anim.setDuration(59950);
-            circle.startAnimation(anim);
-        } else if (time_to_go > 0) {
-            //timer should be running!
+            //save start and end time
+            timer_start_time = Calendar.getInstance().getTimeInMillis();
+            timer_end_time = timer_start_time+getMinutesInMillis(time);
+            anim_time = ONE_MINUTE;
         }
+        //set animation
+        CircleViewAnimation anim = new CircleViewAnimation(circle,360);
+        anim.setDuration(anim_time);
+        circle.startAnimation(anim);
     }
 
     @Override
@@ -156,24 +160,29 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             circle.setOnClickListener(viewClick);
             counter_view.forceLayout();
         } else {
-//            Log.i("CREATE", "TIMER STILL RUNNING, HANDLE THIS CREATE DIFFERENTLY");
-//            //TODO: Set timer display to correct time, make sure the timers are still running (put them in their own thread?)
-//            Calendar c = Calendar.getInstance();
-//            long current_time = c.getTimeInMillis();
-//            if (savedInstanceState.getLong(TIMER_END) > current_time){
-//                //timer end not passed yet
-//                long time_left = savedInstanceState.getLong(TIMER_END)-current_time;
-//                long time_passed = current_time - savedInstanceState.getLong(TIMER_START);
-//                //set circle to correct display position
-//
-//                //restart countdown and animation
-//                startTimer(time_left);
-//            } else {
-//                //timer end was passed
-//                //TODO: up the counter, etc
-//                circle.setAngle(360.0f);
-//                //finishTimer();
-//            }
+            Log.i("CREATE", "TIMER STILL RUNNING, HANDLE THIS CREATE DIFFERENTLY");
+            //TODO: Set timer display to correct time
+            long current_time = Calendar.getInstance().getTimeInMillis();
+            if (savedInstanceState.getLong(TIMER_END) > current_time){
+                //timer end not passed yet
+                long time_left = savedInstanceState.getLong(TIMER_END)-current_time;
+                long time_passed = current_time - savedInstanceState.getLong(TIMER_START);
+                //set circle to correct display position
+                double current_minute_progress = (double)time_left/ONE_MINUTE;
+                long ms_left_of_minute = Math.round(ONE_MINUTE * (((current_minute_progress * 100) % 100) / 100));
+                circle.setAngle(360/ONE_MINUTE*(ONE_MINUTE-ms_left_of_minute));
+                startTimer(ms_left_of_minute);
+            } else {
+                //timer end was passed
+                //set new time
+                setNextTime();
+                // display
+                timer_text.setText(""+time);
+                counter_view.setCount(work_counter);
+                counter_view.forceLayout();
+                circle.setAngle(0);
+                circle.forceLayout();
+            }
 
         }
         TimerObservable.getInstance().addObserver(this);
@@ -360,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                         circle.setAngle(0.0f);
                         //set animation
                         CircleViewAnimation anim = new CircleViewAnimation(circle,360);
-                        anim.setDuration(59950);
+                        anim.setDuration(ONE_MINUTE);
                         circle.startAnimation(anim);
                     }
                 }
