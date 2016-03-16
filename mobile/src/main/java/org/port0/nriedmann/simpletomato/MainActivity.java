@@ -111,10 +111,12 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             timer_end_time = timer_start_time+getMinutesInMillis(time);
             anim_time = ONE_MINUTE;
         }
-        //set animation
-        CircleViewAnimation anim = new CircleViewAnimation(circle,360);
-        anim.setDuration(anim_time);
-        circle.startAnimation(anim);
+        if (anim_time > 0) {
+            //set animation
+            CircleViewAnimation anim = new CircleViewAnimation(circle, 360);
+            anim.setDuration(anim_time);
+            circle.startAnimation(anim);
+        }
     }
 
     @Override
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         super.onResume();
         Log.i("Resume CALLED", "whats wrong");
         this.loadPreferences();
-        this.savePreferences(timer_running,true);
+        //this.savePreferences(timer_running,true);
 //        SharedPreferences prefs = this.getSharedPreferences(getString(R.string.pref_file),MODE_PRIVATE);
 //        long saved_ms = prefs.getLong(getString(R.string.saved_ms),-1);
 //        if (timer_running && saved_ms > -1) {
@@ -155,11 +157,13 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         counter_view.setCount(this.work_counter);
         counter_view.setMax_count(this.long_break_interval);
         if (savedInstanceState == null) {
+            Log.i("CREATE", "SAVED INSTANCE NULL");
             setNextTime();
             timer_text.setText("" + time);
             circle.setOnClickListener(viewClick);
             counter_view.forceLayout();
         } else {
+            //TODO PUT THIS IN RESUME !!
             Log.i("CREATE", "TIMER STILL RUNNING, HANDLE THIS CREATE DIFFERENTLY");
             //TODO: Set timer display to correct time
             long current_time = Calendar.getInstance().getTimeInMillis();
