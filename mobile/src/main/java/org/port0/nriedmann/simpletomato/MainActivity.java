@@ -124,22 +124,46 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         super.onResume();
         Log.i("Resume CALLED", "whats wrong");
         this.loadPreferences();
-        //this.savePreferences(timer_running,true);
-//        SharedPreferences prefs = this.getSharedPreferences(getString(R.string.pref_file),MODE_PRIVATE);
-//        long saved_ms = prefs.getLong(getString(R.string.saved_ms),-1);
-//        if (timer_running && saved_ms > -1) {
-//            long timeleft = 59950 - saved_ms;
-//            float angle = 360/59950*timeleft;
-//            circle.setAngle(angle);
-//            CircleViewAnimation anim = new CircleViewAnimation(circle, 360);
-//            anim.setDuration(timeleft);
-//            circle.startAnimation(anim);
-//        }
+        this.savePreferences(timer_running, true);
+        SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
+        counter_view.setCount(this.work_counter);
+        counter_view.setMax_count(this.long_break_interval);
+        counter_view.forceLayout();
+        if (!timer_running) {
+            Log.i("Resume", "TIMER NOT RUNNING, RESET VIEWS");
+            if (!pref.getBoolean(getString(R.string.next_time_set),false)) {
+                setNextTime();
+            }
+            timer_text.setText("" + time);
+            circle.setAngle(0);
+            circle.forceLayout();
+        } else {
+            //TODO PUT THIS IN RESUME !!
+            Log.i("Resume", "TIMER STILL RUNNING, HANDLE THIS");
+            //TODO: Set timer display to correct time
+            long tick_time_left = pref.getLong(getString(R.string.saved_ms),-1);
+            long tick_timestamp = pref.getLong(getString(R.string.last_tick_timestamp),-1);
+            if (tick_time_left > 0){
+                //timer end not passed yet
+                //set time display to minutes left
+                timer_text.setText("" + getMillisInMin(tick_time_left));
+                //set circle to correct display position
+                //actual time left
+                long current_time = Calendar.getInstance().getTimeInMillis();
+                long time_passed_since_tick = current_time - tick_timestamp;
+                long time_left = tick_time_left - time_passed_since_tick;
 
-        //timer_text.setText("" + time);
-        //counter_view.setCount(this.work_counter);
-        //counter_view.setMax_count(this.long_break_interval);
-        //counter_view.forceLayout();
+                double current_minute_progress = (double)time_left/ONE_MINUTE;
+                long ms_left_of_minute = Math.round(ONE_MINUTE * (((current_minute_progress * 100) % 100) / 100));
+                Log.i("RESUME TIME INFO","LAST TICK: "+tick_time_left+" at "+tick_timestamp+"\nTIME LEFT: "+time_left+"\nPROGRESS: "+current_minute_progress+"\nMS OF MINUTE LEFT: "+ms_left_of_minute+"\nCIRCLE ANGLE: " +360.0f/ONE_MINUTE*(ONE_MINUTE-ms_left_of_minute));
+                if (ms_left_of_minute > 1000) {
+                    circle.setAngle(360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
+                    //start animation again
+                    startTimer(ms_left_of_minute);
+                }
+            }
+        }
+        TimerObservable.getInstance().addObserver(this);
     }
 //TODO:  MAKE THE TIMER A (intent) SERVICE, should save you from running problems, and can replace the additional alarm for the Notification (just send when the timer is done)
     @Override
@@ -147,49 +171,13 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         super.onCreate(savedInstanceState);
         Log.i("Create CALLED", "redoing layout");
         this.loadPreferences();
-        this.savePreferences(timer_running, true);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         this.timer_text = ((TextView) findViewById(R.id.timer_text));
         this.circle = (CircleView) findViewById(R.id.timer_circle);
         this.counter_view = (CounterView) findViewById(R.id.counter_view);
-        counter_view.setCount(this.work_counter);
-        counter_view.setMax_count(this.long_break_interval);
-        if (savedInstanceState == null) {
-            Log.i("CREATE", "SAVED INSTANCE NULL");
-            setNextTime();
-            timer_text.setText("" + time);
-            circle.setOnClickListener(viewClick);
-            counter_view.forceLayout();
-        } else {
-            //TODO PUT THIS IN RESUME !!
-            Log.i("CREATE", "TIMER STILL RUNNING, HANDLE THIS CREATE DIFFERENTLY");
-            //TODO: Set timer display to correct time
-            long current_time = Calendar.getInstance().getTimeInMillis();
-            if (savedInstanceState.getLong(TIMER_END) > current_time){
-                //timer end not passed yet
-                long time_left = savedInstanceState.getLong(TIMER_END)-current_time;
-                long time_passed = current_time - savedInstanceState.getLong(TIMER_START);
-                //set circle to correct display position
-                double current_minute_progress = (double)time_left/ONE_MINUTE;
-                long ms_left_of_minute = Math.round(ONE_MINUTE * (((current_minute_progress * 100) % 100) / 100));
-                circle.setAngle(360/ONE_MINUTE*(ONE_MINUTE-ms_left_of_minute));
-                startTimer(ms_left_of_minute);
-            } else {
-                //timer end was passed
-                //set new time
-                setNextTime();
-                // display
-                timer_text.setText(""+time);
-                counter_view.setCount(work_counter);
-                counter_view.forceLayout();
-                circle.setAngle(0);
-                circle.forceLayout();
-            }
-
-        }
-        TimerObservable.getInstance().addObserver(this);
+        circle.setOnClickListener(viewClick);
     }
 
     @Override
@@ -209,7 +197,8 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     public void onStop(){
         super.onStop();
         Log.i("stop CALLED", "saving");
-        this.savePreferences(false,false);
+        this.savePreferences(false, false);
+        TimerObservable.getInstance().deleteObserver(this);
     }
 
     @Override
@@ -218,34 +207,34 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         Log.i("destroy CALLED", "bye");
     }
 
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.confirm_exit))
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.quit), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        MainActivity.this.finish();
-                    }
-                })
-                .setNegativeButton(getString(R.string.stay), null)
-                .show();
-    }
-
-    @Override
-    public void finish(){
-        super.finish();
-        //TODO HANDLE KILLING OF SERVICE TIMER
-        Log.i("FINISH CALLED", "TIMERS OFF");
-        if (current_timer != null) {
-            this.current_timer.cancel();
-        }
-        if (current_alarm != null) {
-            this.current_alarm.cancel(alarm_intent);
-        }
-        this.timer_running =false;
-        this.savePreferences(false,false);
-    }
+//    @Override
+//    public void onBackPressed() {
+//        new AlertDialog.Builder(this)
+//                .setMessage(getString(R.string.confirm_exit))
+//                .setCancelable(false)
+//                .setPositiveButton(getString(R.string.quit), new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        MainActivity.this.finish();
+//                    }
+//                })
+//                .setNegativeButton(getString(R.string.stay), null)
+//                .show();
+//    }
+//
+//    @Override
+//    public void finish(){
+//        super.finish();
+//        //TODO HANDLE KILLING OF SERVICE TIMER
+//        Log.i("FINISH CALLED", "TIMERS OFF");
+//        if (current_timer != null) {
+//            this.current_timer.cancel();
+//        }
+//        if (current_alarm != null) {
+//            this.current_alarm.cancel(alarm_intent);
+//        }
+//        this.timer_running =false;
+//        this.savePreferences(false,false);
+//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

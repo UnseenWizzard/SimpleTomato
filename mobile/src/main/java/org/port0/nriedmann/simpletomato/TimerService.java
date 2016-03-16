@@ -74,13 +74,14 @@ public class TimerService extends Service {
 //                        info.putExtra(getString(R.string.saved_ms), millisUntilFinished);
 //                        sendBroadcast(info);
                         TimerObservable.getInstance().update(false, millisUntilFinished);
-                    } else {
-                        //else save info to shared prefs
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putLong(getString(R.string.saved_ms), millisUntilFinished);
-                        editor.putBoolean(getString(R.string.timer_running),true);
-                        editor.commit();
                     }
+                    //always save info to shared prefs
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putLong(getString(R.string.saved_ms), millisUntilFinished);
+                    editor.putLong(getString(R.string.last_tick_timestamp),Calendar.getInstance().getTimeInMillis());
+                    editor.putBoolean(getString(R.string.timer_running),true);
+                    editor.commit();
+
 //                   timer_text.setText("" + (getMillisInMin(millisUntilFinished)));
 //                    SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
 //                    SharedPreferences.Editor editor = pref.edit();
@@ -111,6 +112,7 @@ public class TimerService extends Service {
                     //save info to shared prefs
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putLong(getString(R.string.saved_ms), 0);
+                    editor.putLong(getString(R.string.last_tick_timestamp),Calendar.getInstance().getTimeInMillis());
                     editor.putBoolean(getString(R.string.timer_running), false);
                     editor.putBoolean(getString(R.string.next_time_set), false);
                     editor.putInt(getString(R.string.work_counter), work_counter);

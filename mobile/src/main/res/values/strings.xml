@@ -30,4 +30,5 @@
     <string name="timer_info" translatable="false">org.port0.nriedman.simpletomato.TIMER_INFO_BROADCAST</string>
     <string name="next_time_set" translatable="false">org.port0.nriedman.simpletomato.next_time_set</string>
     <string name="start_from_notification" translatable="false">org.port0.nriedman.simpletomato.START_FROM_NOTFICATION</string>
+    <string name="last_tick_timestamp" translatable="false" >org.port0.nriedman.simpletomato.last_tick_timestamp</string>
 </resources>
