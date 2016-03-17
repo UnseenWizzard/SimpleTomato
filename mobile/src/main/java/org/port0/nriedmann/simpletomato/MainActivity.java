@@ -68,8 +68,12 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
 
     private View.OnClickListener viewClick = new View.OnClickListener() {
         public void onClick(View v) {
-            Log.i("CLICK", "clicked the view");
-            startTimer(-1);
+            if (!timer_running){
+                timer_running=true;
+                savePreferences(true,true);
+                Log.i("CLICK", "clicked the view");
+                startTimer(true,-1);
+            }
         }
     };
 
@@ -93,15 +97,17 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                 updateCounterView();
             }
         }
+        getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE).edit().putBoolean(getString(R.string.next_time_set),true);
     }
 
-    public void startTimer(long time_to_go){
+    public void startTimer(boolean new_start, long time_to_go){
         long anim_time = time_to_go;
-        if (!timer_running){
+        if (!timer_running || new_start){
             //timer not running, start everything
             String msg = (break_now)?"Time for a break!":"Get to work!";
             Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-            timer_running =true;
+            timer_running=true;
+            savePreferences(true,true);
             //start the timer service
             Intent timer_intent = new Intent(this,TimerService.class);
             timer_intent.putExtra(TimerService.RUN_TIME_MS, getMinutesInMillis(time));
@@ -135,8 +141,8 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                 setNextTime();
             }
             timer_text.setText("" + time);
-            circle.setAngle(0);
-            circle.forceLayout();
+            circle.setAngle(0.0f);
+            //circle.forceLayout();
         } else {
             //TODO PUT THIS IN RESUME !!
             Log.i("Resume", "TIMER STILL RUNNING, HANDLE THIS");
@@ -152,14 +158,30 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                 long current_time = Calendar.getInstance().getTimeInMillis();
                 long time_passed_since_tick = current_time - tick_timestamp;
                 long time_left = tick_time_left - time_passed_since_tick;
-
-                double current_minute_progress = (double)time_left/ONE_MINUTE;
-                long ms_left_of_minute = Math.round(ONE_MINUTE * (((current_minute_progress * 100) % 100) / 100));
-                Log.i("RESUME TIME INFO","LAST TICK: "+tick_time_left+" at "+tick_timestamp+"\nTIME LEFT: "+time_left+"\nPROGRESS: "+current_minute_progress+"\nMS OF MINUTE LEFT: "+ms_left_of_minute+"\nCIRCLE ANGLE: " +360.0f/ONE_MINUTE*(ONE_MINUTE-ms_left_of_minute));
-                if (ms_left_of_minute > 1000) {
-                    circle.setAngle(360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
-                    //start animation again
-                    startTimer(ms_left_of_minute);
+                if (time_left > 0) {
+                    double current_minute_progress = (double) time_left / ONE_MINUTE;
+                    long ms_left_of_minute = Math.round(ONE_MINUTE * (((current_minute_progress * 100) % 100) / 100));
+                    Log.i("RESUME TIME INFO", "LAST TICK: " + tick_time_left + " at " + tick_timestamp + "\nTIME LEFT: " + time_left + "\nPROGRESS: " + current_minute_progress + "\nMS OF MINUTE LEFT: " + ms_left_of_minute + "\nCIRCLE ANGLE: " + 360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
+                    if (ms_left_of_minute > 1000) {
+                        circle.setAngle(360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
+                        //start animation again
+                        startTimer(false,ms_left_of_minute);
+                    }
+                } else {
+                    //missed the timer end!
+                    Log.i("Resume", "TIMER NOT RUNNING, RESET VIEWS");
+                    timer_running = false;
+                    //advance work counter
+                    work_counter = (break_now) ? work_counter : work_counter + 1;
+                    //toggle break bool
+                    break_now = !break_now;
+                    savePreferences(false,true);
+                    if (!pref.getBoolean(getString(R.string.next_time_set),false)) {
+                        setNextTime();
+                    }
+                    timer_text.setText("" + time);
+                    circle.setAngle(0.0f);
+                    //circle.forceLayout();
                 }
             }
         }
@@ -358,11 +380,12 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                         counter_view.forceLayout();
                     } else {
                         //TODO: timer still running, a minute has passed, update the circle & the timer text
-                        timer_text.setText(""+getMillisInMin(info.getTime_till_done_ms()));
-                        circle.setAngle(0.0f);
+                        timer_text.setText("" + getMillisInMin(info.getTime_till_done_ms()));
                         //set animation
                         CircleViewAnimation anim = new CircleViewAnimation(circle,360);
                         anim.setDuration(ONE_MINUTE);
+                        circle.setAngle(0.0f);
+                        //circle.forceLayout();
                         circle.startAnimation(anim);
                     }
                 }

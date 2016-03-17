@@ -143,6 +143,7 @@ public class TimerService extends Service {
                     }
                     Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
                     mainIntent.setAction(getString(R.string.start_from_notification));
+                    mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     notification.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, mainIntent, 0));
                     ((NotificationManager) getSystemService(getApplicationContext().NOTIFICATION_SERVICE)).notify(42, notification.build());
                     stopSelf(startId);
