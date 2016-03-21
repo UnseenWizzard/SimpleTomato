@@ -70,8 +70,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         public void onClick(View v) {
             if (!timer_running){
                 timer_running=true;
-                savePreferences(true,true);
-                Log.i("CLICK", "clicked the view");
+                savePreferences(true, true);
                 startTimer(true,-1);
             }
         }
@@ -97,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                 updateCounterView();
             }
         }
-        getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE).edit().putBoolean(getString(R.string.next_time_set),true);
+        getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE).edit().putBoolean(getString(R.string.next_time_set),true).commit();
     }
 
     public void startTimer(boolean new_start, long time_to_go){
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     @Override
     public void onResume(){
         super.onResume();
-        Log.i("Resume CALLED", "whats wrong");
         this.loadPreferences();
         this.savePreferences(timer_running, true);
         SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
@@ -136,17 +134,13 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         counter_view.setMax_count(this.long_break_interval);
         counter_view.invalidate();
         if (!timer_running) {
-            Log.i("Resume", "TIMER NOT RUNNING, RESET VIEWS");
             if (!pref.getBoolean(getString(R.string.next_time_set),false)) {
                 setNextTime();
             }
             timer_text.setText("" + time);
             circle.setAngle(0.0f);
-            circle.invalidate();
+//            circle.invalidate();
         } else {
-            //TODO PUT THIS IN RESUME !!
-            Log.i("Resume", "TIMER STILL RUNNING, HANDLE THIS");
-            //TODO: Set timer display to correct time
             long tick_time_left = pref.getLong(getString(R.string.saved_ms),-1);
             long tick_timestamp = pref.getLong(getString(R.string.last_tick_timestamp),-1);
             if (tick_time_left > 0){
@@ -161,38 +155,34 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                 if (time_left > 0) {
                     double current_minute_progress = (double) time_left / ONE_MINUTE;
                     long ms_left_of_minute = Math.round(ONE_MINUTE * (((current_minute_progress * 100) % 100) / 100));
-                    Log.i("RESUME TIME INFO", "LAST TICK: " + tick_time_left + " at " + tick_timestamp + "\nTIME LEFT: " + time_left + "\nPROGRESS: " + current_minute_progress + "\nMS OF MINUTE LEFT: " + ms_left_of_minute + "\nCIRCLE ANGLE: " + 360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
                     if (ms_left_of_minute > 1000) {
                         circle.setAngle(360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
-                        circle.invalidate();
+                        //circle.invalidate();
                         //start animation again
                         startTimer(false,ms_left_of_minute);
                     }
                 } else {
                     //missed the timer end!
-                    Log.i("Resume", "TIMER NOT RUNNING, MISSED END");
                     timer_running = false;
                     //advance work counter
                     work_counter = (break_now) ? work_counter : work_counter + 1;
                     //toggle break bool
                     break_now = !break_now;
-                    savePreferences(false,true);
+                    savePreferences(false, true);
                     if (!pref.getBoolean(getString(R.string.next_time_set),false)) {
                         setNextTime();
                     }
                     timer_text.setText("" + time);
                     circle.setAngle(0.0f);
-                    circle.invalidate();
+//                    circle.invalidate();
                 }
             }
         }
         TimerObservable.getInstance().addObserver(this);
     }
-//TODO:  MAKE THE TIMER A (intent) SERVICE, should save you from running problems, and can replace the additional alarm for the Notification (just send when the timer is done)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("Create CALLED", "redoing layout");
         this.loadPreferences();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -206,20 +196,17 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     @Override
     public void onStart() {
         super.onStart();
-        Log.i("start CALLED", "nothing");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.i("pause CALLED", "saving");
         this.savePreferences(false,false);
     }
 
     @Override
     public void onStop(){
         super.onStop();
-        Log.i("stop CALLED", "saving");
         this.savePreferences(false, false);
         TimerObservable.getInstance().deleteObserver(this);
     }
@@ -227,37 +214,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Log.i("destroy CALLED", "bye");
     }
-
-//    @Override
-//    public void onBackPressed() {
-//        new AlertDialog.Builder(this)
-//                .setMessage(getString(R.string.confirm_exit))
-//                .setCancelable(false)
-//                .setPositiveButton(getString(R.string.quit), new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        MainActivity.this.finish();
-//                    }
-//                })
-//                .setNegativeButton(getString(R.string.stay), null)
-//                .show();
-//    }
-//
-//    @Override
-//    public void finish(){
-//        super.finish();
-//        //TODO HANDLE KILLING OF SERVICE TIMER
-//        Log.i("FINISH CALLED", "TIMERS OFF");
-//        if (current_timer != null) {
-//            this.current_timer.cancel();
-//        }
-//        if (current_alarm != null) {
-//            this.current_alarm.cancel(alarm_intent);
-//        }
-//        this.timer_running =false;
-//        this.savePreferences(false,false);
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -366,27 +323,28 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("ST_TIMER", "observed an update!");
                     if (info.is_done()){
-                        //TODO: timer done, setNext time, reset the view,
+                        //timer done, setNext time, reset the view,
                         //reset circle
                         CircleViewAnimation resetAnim = new CircleViewAnimation(circle,0);
                         resetAnim.setDuration(700);
                         circle.startAnimation(resetAnim);
                         //set new time
-                        setNextTime();
+                        if (!getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE).getBoolean(getString(R.string.next_time_set),false)) {
+                            setNextTime();
+                        }
                         // display
                         timer_text.setText(""+time);
                         counter_view.setCount(work_counter);
                         counter_view.invalidate();
                     } else {
-                        //TODO: timer still running, a minute has passed, update the circle & the timer text
+                        //timer still running, a minute has passed, update the circle & the timer text
                         timer_text.setText("" + getMillisInMin(info.getTime_till_done_ms()));
+                        //reset circle
+                        circle.setAngle(0.0f);
                         //set animation
                         CircleViewAnimation anim = new CircleViewAnimation(circle,360);
                         anim.setDuration(ONE_MINUTE);
-                        circle.setAngle(0.0f);
-                        circle.invalidate();
                         circle.startAnimation(anim);
                     }
                 }

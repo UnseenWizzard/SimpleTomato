@@ -56,7 +56,7 @@ public class SettingsDialog extends DialogFragment {
         intervals.setMinValue(1);
         intervals.setMaxValue(100);
 
-        //TODO: Load currently set values
+        // Load currently set values
         work.setValue(getArguments().getInt(getString(R.string.work_time)));
         brk.setValue(getArguments().getInt(getString(R.string.break_time)));
         longBrk.setValue(getArguments().getInt(getString(R.string.long_break_time)));

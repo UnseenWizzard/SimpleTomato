@@ -1,7 +1,5 @@
 package org.port0.nriedmann.simpletomato;
 
-import android.app.AlarmManager;
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,13 +10,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.Calendar;
 
 
@@ -31,13 +24,8 @@ public class TimerService extends Service {
     public final static String IS_DONE = "IS_DONE";
     private Thread worker;
 
-//    public TimerService(){
-//        super("TimerService");
-//    }
-
     @Override
     public void onDestroy() {
-        Log.i("Service","Service killed!!");
         super.onDestroy();
 
     }
@@ -51,7 +39,6 @@ public class TimerService extends Service {
     public int onStartCommand(Intent intent, int flags, final int startId) {
         //get timer time from intent
         if (intent == null){
-            Log.e("Service","Started with null intent");
             return -1;
         }
         final long run_time_ms = intent.getLongExtra(TimerService.RUN_TIME_MS,-1);
@@ -62,18 +49,12 @@ public class TimerService extends Service {
             final CountDownTimer timer = new CountDownTimer(run_time_ms, MainActivity.ONE_MINUTE) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    Log.i("Timerservice TICK: ", "ms " + millisUntilFinished);
                     //check if the activity is running
                     SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
                     boolean activity_running = pref.getBoolean(getString(R.string.activity_running), false);
                     if (activity_running) {
                         //if running, send update info
-//                        Intent info = new Intent();
-//                        info.setAction(getString(R.string.timer_info));
-//                        info.putExtra(IS_DONE, false);
-//                        info.putExtra(getString(R.string.saved_ms), millisUntilFinished);
-//                        sendBroadcast(info);
-                        TimerObservable.getInstance().update(false, millisUntilFinished);
+                      TimerObservable.getInstance().update(false, millisUntilFinished);
                     }
                     //always save info to shared prefs
                     SharedPreferences.Editor editor = pref.edit();
@@ -81,24 +62,10 @@ public class TimerService extends Service {
                     editor.putLong(getString(R.string.last_tick_timestamp),Calendar.getInstance().getTimeInMillis());
                     editor.putBoolean(getString(R.string.timer_running),true);
                     editor.commit();
-
-//                   timer_text.setText("" + (getMillisInMin(millisUntilFinished)));
-//                    SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = pref.edit();
-//                    editor.putLong(getString(R.string.saved_ms), millisUntilFinished);
-//                    editor.commit();
-//
-//                    circle.setAngle(0.0f);
-//                    circle.forceLayout();
-//                    CircleViewAnimation anim = new CircleViewAnimation(circle,360);
-//                    anim.setDuration(59950);
-//                    Log.i("onTick","starting anim");
-//                    circle.startAnimation(anim);
                 }
 
                 @Override
                 public void onFinish() {
-                    Log.i("Timerservice DONE: ", "done");
                     //check if the activity is running
                     SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
                     boolean activity_running = pref.getBoolean(getString(R.string.activity_running), false);
@@ -119,15 +86,6 @@ public class TimerService extends Service {
                     editor.putBoolean(getString(R.string.break_now), break_now);
                     editor.commit();
 
-                    if (activity_running) {
-                        //if running, send intent to update info
-//                        Intent info = new Intent();
-//                        info.setAction(getString(R.string.timer_info));
-//                        info.putExtra(IS_DONE, true);
-//                        sendBroadcast(info);
-                        TimerObservable.getInstance().update(true,0);
-                    }
-
                     //send notification
                     NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext());
                     notification.setSmallIcon(R.drawable.notification_icon);
@@ -146,6 +104,12 @@ public class TimerService extends Service {
                     mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     notification.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, mainIntent, 0));
                     ((NotificationManager) getSystemService(getApplicationContext().NOTIFICATION_SERVICE)).notify(42, notification.build());
+
+                    if (activity_running) {
+                        //if running, send intent to update info
+                        TimerObservable.getInstance().update(true,0);
+                    }
+
                     stopSelf(startId);
                 }
             };
@@ -161,7 +125,6 @@ public class TimerService extends Service {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //Looper.loop();
         }
         return START_FLAG_REDELIVERY;
     }
