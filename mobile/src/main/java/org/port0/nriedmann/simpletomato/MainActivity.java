@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
     private void updateCounterView(){
         if (work_counter != counter_view.getCount()) {
             counter_view.setCount(work_counter);
-            counter_view.forceLayout();
+            counter_view.invalidate();
         }
     }
 
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
         SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
         counter_view.setCount(this.work_counter);
         counter_view.setMax_count(this.long_break_interval);
-        counter_view.forceLayout();
+        counter_view.invalidate();
         if (!timer_running) {
             Log.i("Resume", "TIMER NOT RUNNING, RESET VIEWS");
             if (!pref.getBoolean(getString(R.string.next_time_set),false)) {
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             }
             timer_text.setText("" + time);
             circle.setAngle(0.0f);
-            //circle.forceLayout();
+            circle.invalidate();
         } else {
             //TODO PUT THIS IN RESUME !!
             Log.i("Resume", "TIMER STILL RUNNING, HANDLE THIS");
@@ -164,12 +164,13 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                     Log.i("RESUME TIME INFO", "LAST TICK: " + tick_time_left + " at " + tick_timestamp + "\nTIME LEFT: " + time_left + "\nPROGRESS: " + current_minute_progress + "\nMS OF MINUTE LEFT: " + ms_left_of_minute + "\nCIRCLE ANGLE: " + 360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
                     if (ms_left_of_minute > 1000) {
                         circle.setAngle(360.0f / ONE_MINUTE * (ONE_MINUTE - ms_left_of_minute));
+                        circle.invalidate();
                         //start animation again
                         startTimer(false,ms_left_of_minute);
                     }
                 } else {
                     //missed the timer end!
-                    Log.i("Resume", "TIMER NOT RUNNING, RESET VIEWS");
+                    Log.i("Resume", "TIMER NOT RUNNING, MISSED END");
                     timer_running = false;
                     //advance work counter
                     work_counter = (break_now) ? work_counter : work_counter + 1;
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                     }
                     timer_text.setText("" + time);
                     circle.setAngle(0.0f);
-                    //circle.forceLayout();
+                    circle.invalidate();
                 }
             }
         }
@@ -327,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
             ((TextView)findViewById(R.id.timer_text)).setText("" + time);
         }
         counter_view.setMax_count(this.long_break_interval);
-        counter_view.forceLayout();
+        counter_view.invalidate();
     }
 
     private void savePreferences(boolean justRunningInfo, boolean activityRunning){
@@ -377,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                         // display
                         timer_text.setText(""+time);
                         counter_view.setCount(work_counter);
-                        counter_view.forceLayout();
+                        counter_view.invalidate();
                     } else {
                         //TODO: timer still running, a minute has passed, update the circle & the timer text
                         timer_text.setText("" + getMillisInMin(info.getTime_till_done_ms()));
@@ -385,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements SettingsDialog.Se
                         CircleViewAnimation anim = new CircleViewAnimation(circle,360);
                         anim.setDuration(ONE_MINUTE);
                         circle.setAngle(0.0f);
-                        //circle.forceLayout();
+                        circle.invalidate();
                         circle.startAnimation(anim);
                     }
                 }
